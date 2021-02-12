@@ -31,6 +31,7 @@ package名に com.billies_works.demo を指定した。
 ## 3) 起動
 
 $ mvn clean package
+
 $ mvn payara-micro:start
 
 
