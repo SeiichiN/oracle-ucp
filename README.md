@@ -15,7 +15,7 @@ mydbユーザーで Oracleデータベースにログインして、サンプル
 このスクリプトは、テーブルも作成している。
 
 
-## 2) サンプル・コードを入力する。
+## 2) サンプル・コード
 
 今回は Maven で作成した。
 
@@ -28,4 +28,10 @@ groupId に com.billies_works。
 package名に com.billies_works.demo を指定した。
 
 
+## 3) 起動
 
+$ mvn clean package
+$ mvn payara-micro:start
+
+
+<!-- 修正時刻: Fri Feb 12 18:15:08 2021 -->
