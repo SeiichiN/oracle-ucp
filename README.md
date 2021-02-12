@@ -34,5 +34,9 @@ $ mvn clean package
 
 $ mvn payara-micro:start
 
+ブラウザにて http://localhost:8080/useOracleUCP にアクセス。
 
-<!-- 修正時刻: Fri Feb 12 18:15:08 2021 -->
+
+
+
+<!-- 修正時刻: Fri Feb 12 19:13:27 2021 -->
