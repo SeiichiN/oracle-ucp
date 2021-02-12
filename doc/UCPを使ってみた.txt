@@ -1,0 +1,409 @@
+''Oracle Universal Connection Pool for JDBC'' なるものが存在する。
+
+''UCP''と略記される。
+
+詳細は、[[Oracle Universal Connection Pool for JDBC開発者ガイド|https://docs.oracle.com/cd/E16338_01/java.112/b56283/toc.htm]] にある。
+
+以下、抜粋。
+
+
+----
+""!!!!! 接続プールの概要
+
+""接続プールは、データベース接続オブジェクトのキャッシュです。オブジェクトは、アプリケーションでデータベースへの接続に使用できる物理的なデータベース接続を表します。実行時に、アプリケーションはプールに接続をリクエストします。リクエストを満たすことができる接続がプールにある場合、その接続がアプリケーションに戻されます。接続が見つからない場合は、新しい接続が作成されてアプリケーションに戻されます。アプリケーションは、その接続を使用してデータベースで処理を実行した後、オブジェクトをプールに返します。その接続は次の接続リクエストに使用できます。
+
+""...(略)
+
+""!!!!! Universal Connection Pool for JDBCの概要
+
+""UCP for JDBCは、JDBC接続をキャッシュするための接続プールを実装します。データベース集約型のJavaアプリケーションでは、この接続プールを使用することでパフォーマンスが向上し、システム・リソースをより効率的に利用します。
+
+""...(略)
+----
+
+要するに、接続のたびに新しい接続オブジェクトを作成するのではなくて、最初に接続プールなるものを作って、接続のたびに、そのプールから接続オブジェクトを借りて、作業が終ったら、返却するということみたい。
+
+とすると、''DriverManager''よりもいいってことになる。
+
+
+全部読んだわけじゃないけど、ちょっと触ってみた。
+
+!!!!! (注)
+
+ネットを調べると、JDBCドライバの使用例としては、''DriverManager''の例が圧倒的に多い。
+
+UCPドライバを使った例はあまり見当らない。
+
+(JavaEEのフレームラークに組み込まれているからだろうか)
+
+Oracleのサイトにある文書を見てやってみるしかないみたい。
+
+(ネットの情報も、Oracleの文書そのままが多いみたい)
+
+
+
+!!!! ドライバの入手
+
+
+ドライバについては、以下から入手できる。
+
+[[JDBC and UCP Downloads page|https://www.oracle.com/database/technologies/appdev/jdbc-downloads.html]]
+
+今回は、このページの下のほうの ''Older Releases - 12c JDBC drivers'' の
+うちから、
+
+''Oracle Database 12c Release 2 (12.2.0.1)'' を使用した。
+
+このリンクをクリックすると、
+
+[[Oracle Database 12.2.0.1 JDBC Driver & UCP Downloads|https://www.oracle.com/database/technologies/jdbc-ucp-122-downloads.html]]
+
+が開くので、一番上の
+
+''ojdbc8-full.tar.gz'' をダウンロードする。
+
+すると、下にある ''ojdbc8.jar''、''ucp.jar'' などが全て一括して入手できる。
+
+これらは、''/WEB-INF/lib'' におく。
+
+!!!!! Maven の場合
+
+Maven の場合は、''pom.xml'' に以下を記述する。
+
+<<<
+<dependencies>
+  ....
+  <!-- https://mvnrepository.com/artifact/com.oracle.jdbc/ojdbc8 -->
+  <dependency>
+    <groupId>com.oracle.database.jdbc</groupId>
+    <artifactId>ojdbc8-production</artifactId>
+    <version>19.7.0.0</version>
+    <type>pom</type>
+  </dependency>
+  ....
+>>>
+
+これで、上記 ''ojdbc8-full.tar.gz'' をインストールしたのと同じことができる。
+
+
+
+!!!! UCPドライバを使う
+
+作成したコードは、これ。
+
+''EmpDao.java''
+<<<
+/**
+ * 参考URL
+ *   ユニバーサル接続プールの動作の最適化
+ *   https://docs.oracle.com/cd/E16338_01/java.112/b56283/optimize.htm
+ */
+
+package com.billies_works.demo.dao;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.DatabaseMetaData;
+import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
+
+import oracle.ucp.jdbc.PoolDataSourceFactory;
+import oracle.ucp.jdbc.PoolDataSource;
+
+import com.billies_works.demo.model.Emp;
+import com.billies_works.demo.model.EmpDept;
+import com.billies_works.demo.model.Dept;
+
+public class EmpDao {
+    final static String DB_URL =
+        "jdbc:oracle:thin:@localhost:1521/XE";
+    final static String DB_USER = "mydb";
+    final static String DB_PASS = "app";
+    final static String CONN_FACTORY_CLASS_NAME="oracle.jdbc.pool.OracleDataSource";
+    static PoolDataSource pds = null;
+
+    public EmpDao () {}
+
+    public void init() throws SQLException {
+        // Get the PoolDataSource for UCP
+        pds = PoolDataSourceFactory.getPoolDataSource();
+
+        // Set the connection factory first before all other properties.
+        pds.setConnectionFactoryClassName( CONN_FACTORY_CLASS_NAME );
+        pds.setURL( DB_URL );
+        pds.setUser( DB_USER );
+        pds.setPassword( DB_PASS );
+        pds.setConnectionPoolName( "JDBC_UCP_POOL" );
+
+        // Set the initial number of connection to be created when UCP is started.
+        // 初期プールサイズの設定
+        // Default is 0.
+        pds.setInitialPoolSize( 5 );
+
+        // Set the minimum number of connections that is maintained by UCP at runtime.
+        // 最小プールサイズの設定
+        // Default is 0.
+        pds.setMinPoolSize( 5 );
+
+        // Set the maximum number of connection allowed on the connection pool.
+        // 最大プールサイズの設定
+        // Default is Integer.MAX_VALUE (2147483647).
+        pds.setMaxPoolSize( 20 );
+
+        // Set the frequency in seconds to enforce the timeout properties.
+        // タイムアウト・チェック間隔の設定
+        // 強制タイムアウト(チェック)の頻度を秒単位で設定する。
+        // つまり、接続のタイムアウト時に、実際には接続がプールに回収されない
+        // ことがある。
+        // Default is 30secs.
+        // inactiveConnectionTimeout(int secs), AbondonedConnectionTimeout(secs),
+        // TimeToLiveConnectionTimeout(int secs) に適用される。
+        // 有効な値の範囲は 0 ... Integer.MAX_VALUE である。
+        pds.setTimeoutCheckInterval( 5 );
+
+        // Set the maximum time, in seconds, that a connection remains available
+        // in the connection pool.
+        // 非アクティブ接続タイムアウトの設定
+        // クローズしてプールから削除されるまでの、使用可能な接続がアイドル状態で
+        // いられる時間(sec)。
+        // Default is 0.
+        pds.setInactiveConnectionTimeout( 10 );
+
+    }
+
+    /**
+     * 現在の接続プールの状態
+     *   Available connections -- 現在使用可能な接続オブジェクトの数
+     *   Borrowed connections  -- 借りた状態の接続オブジェクトの数
+     */
+    private void printPoolConnection( PoolDataSource pds, String checkInOut ) {
+        try {
+            System.out.println("Available connections after " + checkInOut + " : "
+                               + pds.getAvailableConnectionsCount());
+            System.out.println("Borrowed connections after " + checkInOut + " : "
+                               + pds.getBorrowedConnectionsCount());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Empテーブルの一覧表示
+     */
+    public List<Emp> findEmpAll () {
+        List<Emp> empList = new ArrayList<>();
+        String sql = "SELECT * FROM emp";
+
+        try {
+            if (pds == null) {
+                init();
+                pds.setValidateConnectionOnBorrow(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            printConnectionInfo( conn );
+        
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                Statement statement = conn.createStatement();
+                ResultSet rs = statement.executeQuery( sql );
+            
+                // PreparedStatement pStmt = conn.prepareStatement( sql );
+                // ResultSet rs = pStmt.executeQuery();
+
+                while (rs.next()) {
+                    Integer empno = rs.getInt("empno");
+                    String ename = rs.getString("ename");
+                    String job = rs.getString("job");
+                    Integer sal = rs.getInt("sal");
+                    Integer age = rs.getInt("age");
+                    Integer deptno = rs.getInt("deptno");
+
+                    Emp emp = new Emp( empno, ename, job, sal, age, deptno );
+                    empList.add( emp );
+                }
+            } catch (SQLException e) {
+                System.out.println("EmpDao - findEmpAll - " + "SQLException occurred : " +
+                                   e.getMessage());
+                System.out.println("エラーでっせ!");
+                return null;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - get.connection - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+        }
+        printPoolConnection( pds,"checkin" );
+
+        return empList;
+    }
+
+    /**
+     * EmpDept -- EmpテーブルとDeptテーブルの外部結合
+     */
+    public List<EmpDept> findEmpDeptAll () {
+        try {
+            if (pds == null) {
+                init();
+                pds.setValidateConnectionOnBorrow(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        List<EmpDept> empDeptList = new ArrayList<>();
+        String sql = "SELECT empno, ename, job, age, dname FROM emp";
+        sql = sql + " left outer join dept on emp.deptno = dept.deptno";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            // a database operation
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                Statement statement = conn.createStatement();
+                ResultSet rs = statement.executeQuery( sql );
+            
+                while (rs.next()) {
+                    Integer empno = rs.getInt("empno");
+                    String ename = rs.getString("ename");
+                    String job = rs.getString("job");
+                    Integer age = rs.getInt("age");
+                    String dname = rs.getString("dname");
+
+                    EmpDept empDept = new EmpDept( empno, ename, job, age, dname );
+                    empDeptList.add( empDept );
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return null;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - getConnection - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+        }
+        printPoolConnection( pds,"checkin" );
+        return empDeptList;
+    }
+
+    /**
+     * Deptテーブルの一覧
+     */
+    public List<Dept> findDeptAll () {
+        try {
+            if (pds == null) {
+                init();
+                pds.setValidateConnectionOnBorrow(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        
+        List<Dept> deptList = new ArrayList<>();
+        String sql = "SELECT deptno, dname, telno FROM dept";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            // a database operation
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                Statement statement = conn.createStatement();
+                ResultSet rs = statement.executeQuery( sql );
+
+                while (rs.next()) {
+                    Integer deptno = rs.getInt("deptno");
+                    String dname = rs.getString("dname");
+                    String telno = rs.getString("telno");
+
+                    Dept dept = new Dept( deptno, dname, telno );
+                    deptList.add( dept );
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return null;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - getConnection - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+        }
+        printPoolConnection( pds,"checkin" );
+        return deptList;
+    }
+
+    /**
+     * Connection の内容表示
+     *   もう少し、いいメソッドがあるだろうな。
+     */
+    private void printConnectionInfo( Connection conn ) {
+        try {
+            DatabaseMetaData dbmd = conn.getMetaData();
+            System.out.println("Driver Name: " + dbmd.getDriverName());
+            System.out.println("Driver Version: " + dbmd.getDriverVersion());
+            // System.out.println("Default Row Prefetch Value is: " + conn.getDefaultRowPrefetch());
+            // System.out.println("Database Username is: " + conn.getUserName());
+            System.out.println();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+>>>
+
+ポイントは、以下である。
+
+フィールドにて ''static PoolDataSource pds = null；'' とすることで、
+PoolDataSourceオブジェクトを確保している。
+
+そして、各メソッドにて、以下を記述。
+
+<<<
+try {
+    if (pds == null) {
+        init();
+        pds.setValidateConnectionOnBorrow(true);
+    }
+} catch (SQLException e) {
+    e.printStackTrace();
+}
+>>>
+
+PoolDataSourceオブジェクトが null ならば、init()メソッドにて、
+PoolDataSourceオブジェクトを生成し、各種プロパティを設定している。
+
+もしも、nullでなかったなら、PoolDataSourceオブジェクトは存在しているので、つまり、
+接続プールができているので、その PoolDataSourceオブジェクトを使って、
+
+<<<
+try (Connection conn = pds.getConnection()) {
+...
+>>>
+
+と、接続オブジェクトを作成している。
+
+この ''getConnection()'' は、接続プールが無ければ、新しい接続オブジェクトを返し、
+接続プールがあれば、そこから接続オブジェクトを借りて、そのオブジェクトを返してくれる。
+
+""アプリケーションは、getConnectionメソッドを使用して、java.sql.Connectionタイプの接続ハンドルをプールから流用します。リクエストされた接続と一致する（同じURL、ユーザー名およびパスワード）接続ハンドルがすでにプール内に存在する場合は、その接続ハンドルがアプリケーションに戻されます。存在しない場合は、新しい接続が作成され、新しい接続ハンドルがアプリケーションに戻されます。OracleとMySQLの両方の例を示します。
+[[3 UCPでのデータベース接続の取得(プール対応のデータソースの使用方法)|https://docs.oracle.com/cd/E16338_01/java.112/b56283/connect.htm#CHDGEJJF]]
+
+
+
+
+
+;; 修正時刻: Fri Feb 12 13:42:02 2021
