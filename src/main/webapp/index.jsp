@@ -11,19 +11,19 @@ String today = sdf.format(date);
 <html lang="ja">
   <head>
     <meta charset="utf-8"/>
-    <title>どこつぶ</title>
+    <title>社員一覧</title>
   </head>
   <body>
-    <h1>どこつぶへようこそ</h1>
-    <time><%= today %></time>
-    <p>管理人:<%= name %></p>
+    <h1>社員一覧</h1>
     <nav>
-      <li><a href="/useOracleUCP/Main">Empを見る</a></li>
-      <li><a href="/useOracleUCP/DeptMain">所属部一覧を見る</a></li>
-      <li><a href="/useOracleUCP/EmpDeptMain">EmpDept</a></li>
+      <li><a href="/useOracleUCP/EmpDeptMain">社員一覧</a></li>
+      <li><a href="/useOracleUCP/Main">社員編集</a></li>
+      <li><a href="/useOracleUCP/DeptMain">所属部編集</a></li>
     </nav>
+    <p>担当: 総務部 <%= name %></p>
+    <time><%= today %></time>
     <jsp:include page="/footer.jsp" /> 
   </body>
 </html>
 
-<!-- 修正時刻: Fri Feb 12 07:59:40 2021 -->
+<!-- 修正時刻: Sat Feb 13 07:41:27 2021 -->

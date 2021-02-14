@@ -12,7 +12,7 @@ public class Emp implements Serializable {
 
     public Emp() {}
 
-    public Emp( Integer empne,
+    public Emp( Integer empno,
                 String ename,
                 String job,
                 Integer sal,
@@ -53,4 +53,4 @@ public class Emp implements Serializable {
     }
 }
 
-// 修正時刻: Mon Feb  1 15:12:17 2021
+// 修正時刻: Mon Feb 15 07:22:18 2021

@@ -14,6 +14,7 @@
     <h1>Emp List</h1>
     <table>
       <tr>
+        <th>職員No</th>
         <th>名前</th>
         <th>課</th>
         <th>給与</th>
@@ -22,6 +23,7 @@
       </tr>
     <c:forEach var="emp" items="${empList}">
       <tr>
+        <td>${emp.empno}</td>
         <td>${emp.ename}</td>
         <td>${emp.job}</td>
         <td>${emp.sal}</td>
@@ -34,4 +36,4 @@
   </body>
 </html>
 
-<!-- 修正時刻: Fri Feb 12 07:22:04 2021 -->
+<!-- 修正時刻: Mon Feb 15 07:36:23 2021 -->

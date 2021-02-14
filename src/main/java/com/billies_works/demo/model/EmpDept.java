@@ -11,7 +11,7 @@ public class EmpDept implements Serializable {
 
     public EmpDept() {}
 
-    public EmpDept( Integer empne,
+    public EmpDept( Integer empno,
                 String ename,
                 String job,
                 Integer age,
@@ -48,4 +48,4 @@ public class EmpDept implements Serializable {
     }
 }
 
-// 修正時刻: Wed Feb 10 12:08:35 2021
+// 修正時刻: Mon Feb 15 07:42:42 2021
