@@ -122,7 +122,7 @@ public class EmpDao {
             printConnectionInfo( conn );
         
             try {
-                conn.setAutoCommit( false );  // Default is true
+                // conn.setAutoCommit( false );  // Default is true
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery( sql );
             
@@ -177,7 +177,7 @@ public class EmpDao {
             // a database operation
 
             try {
-                conn.setAutoCommit( false );  // Default is true
+                // conn.setAutoCommit( false );  // Default is true
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery( sql );
             
@@ -225,7 +225,7 @@ public class EmpDao {
             // a database operation
 
             try {
-                conn.setAutoCommit( false );  // Default is true
+                // conn.setAutoCommit( false );  // Default is true
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery( sql );
 
@@ -271,7 +271,7 @@ public class EmpDao {
             // a database operation
 
             try {
-                conn.setAutoCommit( false );  // Default is true
+                // conn.setAutoCommit( false );  // Default is true
                 PreparedStatement statement = conn.prepareStatement( sql );
                 statement.setInt( 1, empno );
                 ResultSet rs = statement.executeQuery();
@@ -331,7 +331,7 @@ public class EmpDao {
             // a database operation
 
             try {
-                conn.setAutoCommit( false );  // Default is true
+                // conn.setAutoCommit( false );  // Default is true
                 PreparedStatement statement = conn.prepareStatement( sql );
                 statement.setString( 1, emp.getEname() );
                 statement.setString( 2, emp.getJob() );
@@ -371,4 +371,4 @@ public class EmpDao {
     }
 }
 
-// 修正時刻: Mon Feb 15 15:57:04 2021
+// 修正時刻: Mon Feb 15 16:12:49 2021
