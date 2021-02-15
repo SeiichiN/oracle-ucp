@@ -8,26 +8,36 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8"/>
-    <title>Dept</title>
+    <title>所属部編集</title>
   </head>
   <body>
-    <h1>Dept List</h1>
+    <h1>所属部編集</h1>
     <table>
       <tr>
         <th>所属No</th>
         <th>所属部名</th>
         <th>電話番号</th>
+        <th></th>
+        <th></th>
       </tr>
     <c:forEach var="dept" items="${deptList}">
       <tr>
         <td>${dept.deptno}</td>
         <td>${dept.dname}</td>
         <td>${dept.telno}</td>
+        <td>
+          <form action="/useOracleUCP/EditDept" method="post">
+            <input type="hidden" name="deptno" value="${dept.deptno}"/>
+            <input type="submit" value="編集"/>
+          </form>
+        </td>
+        <td>削除</td>
       </tr>
     </c:forEach>
     </table>
     <p><a href="/useOracleUCP">戻る</a></p>
+    <jsp:include page="/footer.jsp" /> 
   </body>
 </html>
 
-<!-- 修正時刻: Fri Feb 12 07:21:40 2021 -->
+<!-- 修正時刻: Tue Feb 16 07:21:34 2021 -->

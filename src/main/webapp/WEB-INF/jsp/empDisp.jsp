@@ -8,10 +8,10 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8"/>
-    <title>EMP</title>
+    <title>社員編集</title>
   </head>
   <body>
-    <h1>Emp List</h1>
+    <h1>社員編集</h1>
     <p>${msg}</p>
     <table>
       <tr>
@@ -21,8 +21,8 @@
         <th>給与</th>
         <th>年齢</th>
         <th>所属</th>
-        <th>編集</th>
-        <th>削除</th>
+        <th></th>
+        <th></th>
       </tr>
     <c:forEach var="emp" items="${empList}">
       <tr>
@@ -43,7 +43,8 @@
     </c:forEach>
     </table>
     <p><a href="/useOracleUCP">戻る</a></p>
+    <jsp:include page="/footer.jsp" /> 
   </body>
 </html>
 
-<!-- 修正時刻: Mon Feb 15 20:46:58 2021 -->
+<!-- 修正時刻: Tue Feb 16 06:53:49 2021 -->

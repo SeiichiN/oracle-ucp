@@ -31,7 +31,8 @@
     </c:forEach>
     </table>
     <p><a href="/useOracleUCP">戻る</a></p>
+    <jsp:include page="/footer.jsp" /> 
   </body>
 </html>
 
-<!-- 修正時刻: Mon Feb 15 07:38:36 2021 -->
+<!-- 修正時刻: Tue Feb 16 06:50:25 2021 -->

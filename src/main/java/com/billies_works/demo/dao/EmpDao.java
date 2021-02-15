@@ -356,6 +356,84 @@ public class EmpDao {
         return true;
     }
 
+
+    
+    public Dept findDept( int deptno ) {
+        checkInit();
+        
+        Dept dept = null;
+        
+        String sql = "SELECT * FROM dept where deptno = ?";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            // a database operation
+
+            try {
+                // conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setInt( 1, deptno );
+                ResultSet rs = statement.executeQuery();
+
+                while (rs.next()) {
+                    deptno = rs.getInt("deptno");
+                    String dname = rs.getString("dname");
+                    String telno = rs.getString("telno");
+
+                    dept = new Dept( deptno, dname, telno );
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return null;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - findDept - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+        }
+        printPoolConnection( pds,"checkin" );
+        return dept;
+    }
+
+    public boolean updateDept( Dept dept ) {
+        checkInit();
+        
+        System.out.println("deptno:" + dept.getDeptno());
+        System.out.println("dname:" + dept.getDname());
+        System.out.println("telno:" + dept.getTelno());
+
+        String sql = "UPDATE dept SET dname = ?, telno = ? ";
+        sql = sql + " where deptno = ?";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            // a database operation
+
+            try {
+                // conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setString( 1, dept.getDname() );
+                statement.setString( 2, dept.getTelno() );
+                statement.setInt( 3, dept.getDeptno() );
+                ResultSet rs = statement.executeQuery();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - updateDept - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+            return false;
+        }
+        printPoolConnection( pds,"checkin" );
+        return true;
+    }
+    
     
     private void printConnectionInfo( Connection conn ) {
         try {
@@ -369,6 +447,17 @@ public class EmpDao {
             e.printStackTrace();
         }
     }
+
+    private void checkInit() {
+        try {
+            if (pds == null) {
+                init();
+                pds.setValidateConnectionOnBorrow(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
-// 修正時刻: Mon Feb 15 16:12:49 2021
+// 修正時刻: Tue Feb 16 08:08:04 2021

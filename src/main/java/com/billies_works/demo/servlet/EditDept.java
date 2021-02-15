@@ -13,38 +13,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.billies_works.demo.model.Emp;
-import com.billies_works.demo.model.GetEmpListLogic;
+import com.billies_works.demo.model.Dept;
+import com.billies_works.demo.model.GetDeptLogic;
 
-@WebServlet("/Main")
-public class Main extends HttpServlet {
+@WebServlet("/EditDept")
+public class EditDept extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    protected void doGet( HttpServletRequest request,
+    protected void doPost( HttpServletRequest request,
                           HttpServletResponse response )
         throws ServletException, IOException {
 
-        GetEmpListLogic getEmpListLogic =
-            new GetEmpListLogic();
+        String deptnoStr = request.getParameter("deptno");
+        int deptno = Integer.parseInt( deptnoStr );
+        System.out.println("deptno:" + deptno);
 
-        List<Emp> empList = getEmpListLogic.execute();
+        GetDeptLogic getDeptLogic =
+            new GetDeptLogic();
 
-        empList.forEach( ele -> {
-                System.out.println(ele);
-            });
+        Dept dept = getDeptLogic.execute( deptno );
 
-        request.setAttribute( "empList", empList );
-        // if (empList.size() > 0) {
-        //     System.out.println("空ではない!");
-        // }
+        request.setAttribute( "dept", dept );
 
         RequestDispatcher dispatcher =
-            request.getRequestDispatcher("/WEB-INF/jsp/empDisp.jsp");
+            request.getRequestDispatcher("/WEB-INF/jsp/editDept.jsp");
         dispatcher.forward( request, response );
     }
 }
 
 
-
-
-// 修正時刻: Tue Feb 16 06:41:21 2021
+// 修正時刻: Tue Feb 16 08:09:06 2021

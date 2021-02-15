@@ -63,7 +63,7 @@ public class UpdateEmp extends HttpServlet {
         request.setAttribute( "empList", empList );
 
         RequestDispatcher dispatcher =
-            request.getRequestDispatcher("/WEB-INF/jsp/mainDisp.jsp");
+            request.getRequestDispatcher("/WEB-INF/jsp/empDisp.jsp");
         dispatcher.forward( request, response );
 
     }
@@ -71,4 +71,4 @@ public class UpdateEmp extends HttpServlet {
 
 
 
-// 修正時刻: Mon Feb 15 20:57:13 2021
+// 修正時刻: Tue Feb 16 06:41:42 2021
