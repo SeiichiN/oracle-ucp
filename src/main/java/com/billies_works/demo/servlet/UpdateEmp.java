@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import com.billies_works.demo.model.Emp;
 import com.billies_works.demo.model.UpdateEmpLogic;
+import com.billies_works.demo.model.GetEmpListLogic;
 
 @WebServlet("/UpdateEmp")
 public class UpdateEmp extends HttpServlet {
@@ -23,8 +24,6 @@ public class UpdateEmp extends HttpServlet {
     protected void doPost( HttpServletRequest request,
                           HttpServletResponse response )
         throws ServletException, IOException {
-
-        request.setCharacterEncoding("UTF-8");
 
         String empnoStr = request.getParameter("empno");
         int empno = Integer.parseInt( empnoStr );
@@ -49,16 +48,27 @@ public class UpdateEmp extends HttpServlet {
         UpdateEmpLogic updateEmpLogic =
             new UpdateEmpLogic();
 
+        String msg = null;
         if (updateEmpLogic.execute( emp )) {
-            RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/WEB-INF/jsp/mainDisp.jsp");
-            dispatcher.forward( request, response );
+            msg = "更新しました";
+        } else {
+            msg = "更新に失敗しました";
         }
+        request.setAttribute("msg", msg);
+        // response.sendRedirect("/useOracleUCP/Main");
 
+        GetEmpListLogic getEmpListLogic =
+            new GetEmpListLogic();
+        List<Emp> empList = getEmpListLogic.execute();
+        request.setAttribute( "empList", empList );
+
+        RequestDispatcher dispatcher =
+            request.getRequestDispatcher("/WEB-INF/jsp/mainDisp.jsp");
+        dispatcher.forward( request, response );
 
     }
 }
 
 
 
-// 修正時刻: Mon Feb 15 15:55:21 2021
+// 修正時刻: Mon Feb 15 20:57:13 2021

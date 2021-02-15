@@ -12,6 +12,7 @@
   </head>
   <body>
     <h1>Emp List</h1>
+    <p>${msg}</p>
     <table>
       <tr>
         <th>職員No</th>
@@ -45,4 +46,4 @@
   </body>
 </html>
 
-<!-- 修正時刻: Mon Feb 15 10:24:24 2021 -->
+<!-- 修正時刻: Mon Feb 15 20:46:58 2021 -->
