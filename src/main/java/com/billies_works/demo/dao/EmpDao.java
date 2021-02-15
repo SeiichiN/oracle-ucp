@@ -10,6 +10,7 @@ import java.sql.Connection;
 // import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.DatabaseMetaData;
 import java.util.Properties;
@@ -251,6 +252,111 @@ public class EmpDao {
         return deptList;
     }
     
+    public Emp findEmp( int empno ) {
+        try {
+            if (pds == null) {
+                init();
+                pds.setValidateConnectionOnBorrow(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Emp emp = null;
+        
+        String sql = "SELECT * FROM emp where empno = ?";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            // a database operation
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setInt( 1, empno );
+                ResultSet rs = statement.executeQuery();
+
+                while (rs.next()) {
+                    empno = rs.getInt("empno");
+                    String ename = rs.getString("ename");
+                    String job = rs.getString("job");
+                    Integer sal = rs.getInt("sal");
+                    Integer age = rs.getInt("age");
+                    Integer deptno = rs.getInt("deptno");
+
+                    emp = new Emp( empno, ename, job, sal, age, deptno );
+
+
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return null;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - findEmp - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+        }
+        printPoolConnection( pds,"checkin" );
+        return emp;
+    }
+
+    public boolean updateEmp( Emp emp ) {
+        try {
+            if (pds == null) {
+                init();
+                pds.setValidateConnectionOnBorrow(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("empno:" + emp.getEmpno());
+        System.out.println("name:" + emp.getEname());
+        System.out.println("job:" + emp.getJob());
+        System.out.println("sal:" + emp.getSal());
+        System.out.println("age:" + emp.getAge());
+        System.out.println("deptno:" + emp.getDeptno());
+
+        
+
+        String sql = "UPDATE emp SET ename = ?, job = ?, ";
+        sql = sql + " sal = ?, age = ?, deptno = ? ";
+        sql = sql + " where empno = ?";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+            // a database operation
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setString( 1, emp.getEname() );
+                statement.setString( 2, emp.getJob() );
+                statement.setInt( 3, emp.getSal() );
+                statement.setInt( 4, emp.getAge() );
+                statement.setInt( 5, emp.getDeptno() );
+                statement.setInt( 6, emp.getEmpno() );
+                ResultSet rs = statement.executeQuery();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - findEmp - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+            return false;
+        }
+        printPoolConnection( pds,"checkin" );
+        return true;
+    }
+
+    
     private void printConnectionInfo( Connection conn ) {
         try {
             DatabaseMetaData dbmd = conn.getMetaData();
@@ -265,4 +371,4 @@ public class EmpDao {
     }
 }
 
-// 修正時刻: Fri Feb 12 12:05:02 2021
+// 修正時刻: Mon Feb 15 15:57:04 2021

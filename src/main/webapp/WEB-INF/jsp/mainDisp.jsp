@@ -20,6 +20,8 @@
         <th>給与</th>
         <th>年齢</th>
         <th>所属</th>
+        <th>編集</th>
+        <th>削除</th>
       </tr>
     <c:forEach var="emp" items="${empList}">
       <tr>
@@ -29,6 +31,13 @@
         <td>${emp.sal}</td>
         <td>${emp.age}</td>
         <td>${emp.deptno}</td>
+        <td>
+          <form action="/useOracleUCP/EditEmp" method="post">
+            <input type="hidden" name="empno" value="${emp.empno}"/>
+            <input type="submit" value="編集"/>
+          </form>
+        </td>
+        <td><a href="useOracleUCP/DeleteEmp/${emp.empno}">削除</a></td>
       </tr>
     </c:forEach>
     </table>
@@ -36,4 +45,4 @@
   </body>
 </html>
 
-<!-- 修正時刻: Mon Feb 15 07:36:23 2021 -->
+<!-- 修正時刻: Mon Feb 15 10:24:24 2021 -->
