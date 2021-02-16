@@ -9,6 +9,7 @@
   <head>
     <meta charset="UTF-8"/>
     <title>社員新規作成</title>
+    <link rel="stylesheet" href="css/style.css"/>
   </head>
   <body>
     <h1>社員新規作成</h1>
@@ -55,4 +56,4 @@
   </body>
 </html>
 
-<!-- 修正時刻: Tue Feb 16 16:02:12 2021 -->
+<!-- 修正時刻: Tue Feb 16 20:52:41 2021 -->

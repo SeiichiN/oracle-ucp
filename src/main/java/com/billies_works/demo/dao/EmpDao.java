@@ -103,31 +103,19 @@ public class EmpDao {
     }
 
     public List<Emp> findEmpAll () {
+        checkInit();
+
         List<Emp> empList = new ArrayList<>();
         String sql = "SELECT * FROM emp";
-
-        try {
-            if (pds == null) {
-                init();
-                pds.setValidateConnectionOnBorrow(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
 
         try (Connection conn = pds.getConnection()) {
             printPoolConnection( pds, "checkout" );
             printConnectionInfo( conn );
         
             try {
-                // conn.setAutoCommit( false );  // Default is true
+                conn.setAutoCommit( false );  // Default is true
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery( sql );
-            
-                // PreparedStatement pStmt = conn.prepareStatement( sql );
-                // ResultSet rs = pStmt.executeQuery();
 
                 while (rs.next()) {
                     Integer empno = rs.getInt("empno");
@@ -140,6 +128,7 @@ public class EmpDao {
                     Emp emp = new Emp( empno, ename, job, sal, age, deptno );
                     empList.add( emp );
                 }
+                conn.commit();
             } catch (SQLException e) {
                 System.out.println("EmpDao - findEmpAll - " + "SQLException occurred : " +
                                    e.getMessage());
@@ -158,15 +147,7 @@ public class EmpDao {
     }
 
     public List<EmpDept> findEmpDeptAll () {
-        try {
-            if (pds == null) {
-                init();
-                pds.setValidateConnectionOnBorrow(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        checkInit();
         
         List<EmpDept> empDeptList = new ArrayList<>();
         String sql = "SELECT empno, ename, job, age, dname FROM emp";
@@ -174,10 +155,9 @@ public class EmpDao {
 
         try (Connection conn = pds.getConnection()) {
             printPoolConnection( pds, "checkout" );
-            // a database operation
 
             try {
-                // conn.setAutoCommit( false );  // Default is true
+                conn.setAutoCommit( false );  // Default is true
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery( sql );
             
@@ -191,6 +171,7 @@ public class EmpDao {
                     EmpDept empDept = new EmpDept( empno, ename, job, age, dname );
                     empDeptList.add( empDept );
                 }
+                conn.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("エラーでっせ!");
@@ -207,25 +188,16 @@ public class EmpDao {
     }
 
     public List<Dept> findDeptAll () {
-        try {
-            if (pds == null) {
-                init();
-                pds.setValidateConnectionOnBorrow(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        checkInit();
         
         List<Dept> deptList = new ArrayList<>();
         String sql = "SELECT deptno, dname, telno FROM dept";
 
         try (Connection conn = pds.getConnection()) {
             printPoolConnection( pds, "checkout" );
-            // a database operation
 
             try {
-                // conn.setAutoCommit( false );  // Default is true
+                conn.setAutoCommit( false );  // Default is true
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery( sql );
 
@@ -237,6 +209,7 @@ public class EmpDao {
                     Dept dept = new Dept( deptno, dname, telno );
                     deptList.add( dept );
                 }
+                conn.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("エラーでっせ!");
@@ -253,14 +226,7 @@ public class EmpDao {
     }
     
     public Emp findEmp( int empno ) {
-        try {
-            if (pds == null) {
-                init();
-                pds.setValidateConnectionOnBorrow(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        checkInit();
 
         Emp emp = null;
         
@@ -268,10 +234,9 @@ public class EmpDao {
 
         try (Connection conn = pds.getConnection()) {
             printPoolConnection( pds, "checkout" );
-            // a database operation
 
             try {
-                // conn.setAutoCommit( false );  // Default is true
+                conn.setAutoCommit( false );  // Default is true
                 PreparedStatement statement = conn.prepareStatement( sql );
                 statement.setInt( 1, empno );
                 ResultSet rs = statement.executeQuery();
@@ -285,9 +250,8 @@ public class EmpDao {
                     Integer deptno = rs.getInt("deptno");
 
                     emp = new Emp( empno, ename, job, sal, age, deptno );
-
-
                 }
+                conn.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("エラーでっせ!");
@@ -324,7 +288,7 @@ public class EmpDao {
             // a database operation
 
             try {
-                // conn.setAutoCommit( false );  // Default is true
+                conn.setAutoCommit( false );  // Default is true
                 PreparedStatement statement = conn.prepareStatement( sql );
                 statement.setString( 1, emp.getEname() );
                 statement.setString( 2, emp.getJob() );
@@ -333,6 +297,7 @@ public class EmpDao {
                 statement.setInt( 5, emp.getDeptno() );
                 statement.setInt( 6, emp.getEmpno() );
                 ResultSet rs = statement.executeQuery();
+                conn.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("エラーでっせ!");
@@ -358,10 +323,11 @@ public class EmpDao {
             printPoolConnection( pds, "checkout" );
 
             try {
-                // conn.setAutoCommit( false );  // Default is true
+                conn.setAutoCommit( false );  // Default is true
                 PreparedStatement statement = conn.prepareStatement( sql );
                 statement.setInt( 1, empno );
                 ResultSet rs = statement.executeQuery();
+                conn.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("エラーでっせ!");
@@ -376,7 +342,41 @@ public class EmpDao {
         }
         printPoolConnection( pds,"checkin" );
         return true;
+    }
 
+    public boolean createEmp( Emp emp ) {
+        checkInit();
+
+        String sql = "INSERT INTO emp VALUES ( ?, ?, ?, ?, ?, ? )";
+        
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setInt( 1, emp.getEmpno() );
+                statement.setString( 2, emp.getEname() );
+                statement.setString( 3, emp.getJob() );
+                statement.setInt( 4, emp.getSal() );
+                statement.setInt( 5, emp.getAge() );
+                statement.setInt( 6, emp.getDeptno() );
+                ResultSet rs = statement.executeQuery();
+                conn.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - deleteEmp - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+            return false;
+        }
+        printPoolConnection( pds,"checkin" );
+        return true;
     }
     
     public Dept findDept( int deptno ) {
@@ -454,6 +454,70 @@ public class EmpDao {
         printPoolConnection( pds,"checkin" );
         return true;
     }
+
+    public boolean deleteDept( int deptno ) {
+        checkInit();
+        
+        Dept dept = null;
+        
+        String sql = "DELETE FROM dept where deptno = ?";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setInt( 1, deptno );
+                ResultSet rs = statement.executeQuery();
+                conn.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - deleteDept - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+            return false;
+        }
+        printPoolConnection( pds,"checkin" );
+        return true;
+    }
+    
+    public boolean createDept( Dept dept ) {
+        checkInit();
+        
+        String sql = "INSERT INTO dept VALUES ( ?, ?, ?)";
+
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+
+            try {
+                conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setInt( 1, dept.getDeptno() );
+                statement.setString( 2, dept.getDname() );
+                statement.setString( 3, dept.getTelno() );
+                ResultSet rs = statement.executeQuery();
+                conn.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - createDept - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+            return false;
+        }
+        printPoolConnection( pds,"checkin" );
+        return true;
+    }
     
     
     private void printConnectionInfo( Connection conn ) {
@@ -481,4 +545,4 @@ public class EmpDao {
     }
 }
 
-// 修正時刻: Tue Feb 16 12:00:44 2021
+// 修正時刻: Tue Feb 16 20:36:04 2021
