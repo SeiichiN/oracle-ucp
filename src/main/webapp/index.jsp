@@ -12,6 +12,7 @@ String today = sdf.format(date);
   <head>
     <meta charset="utf-8"/>
     <title>社員一覧</title>
+    <link rel="stylesheet" href="css/style.css"/>
   </head>
   <body>
     <h1>社員一覧</h1>
@@ -26,4 +27,4 @@ String today = sdf.format(date);
   </body>
 </html>
 
-<!-- 修正時刻: Sat Feb 13 07:41:27 2021 -->
+<!-- 修正時刻: Tue Feb 16 14:45:53 2021 -->

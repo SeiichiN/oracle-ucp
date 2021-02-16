@@ -304,15 +304,8 @@ public class EmpDao {
     }
 
     public boolean updateEmp( Emp emp ) {
-        try {
-            if (pds == null) {
-                init();
-                pds.setValidateConnectionOnBorrow(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        checkInit();
+        
         System.out.println("empno:" + emp.getEmpno());
         System.out.println("name:" + emp.getEname());
         System.out.println("job:" + emp.getJob());
@@ -356,7 +349,35 @@ public class EmpDao {
         return true;
     }
 
+    public boolean deleteEmp( int empno ) {
+        checkInit();
 
+        String sql = "DELETE FROM emp WHERE empno = ?";
+        
+        try (Connection conn = pds.getConnection()) {
+            printPoolConnection( pds, "checkout" );
+
+            try {
+                // conn.setAutoCommit( false );  // Default is true
+                PreparedStatement statement = conn.prepareStatement( sql );
+                statement.setInt( 1, empno );
+                ResultSet rs = statement.executeQuery();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("エラーでっせ!");
+                return false;
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("EmpDao - deleteEmp - "
+                               + "SQLExceptin occurred : "
+                               + e.getMessage());
+            return false;
+        }
+        printPoolConnection( pds,"checkin" );
+        return true;
+
+    }
     
     public Dept findDept( int deptno ) {
         checkInit();
@@ -460,4 +481,4 @@ public class EmpDao {
     }
 }
 
-// 修正時刻: Tue Feb 16 08:08:04 2021
+// 修正時刻: Tue Feb 16 12:00:44 2021

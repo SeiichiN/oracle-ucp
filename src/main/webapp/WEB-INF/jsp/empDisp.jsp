@@ -9,6 +9,7 @@
   <head>
     <meta charset="UTF-8"/>
     <title>社員編集</title>
+    <link rel="stylesheet" href="css/style.css"/>
   </head>
   <body>
     <h1>社員編集</h1>
@@ -38,13 +39,21 @@
             <input type="submit" value="編集"/>
           </form>
         </td>
-        <td><a href="useOracleUCP/DeleteEmp/${emp.empno}">削除</a></td>
+        <td>
+          <form action="/useOracleUCP/DeleteEmp" method="post"
+                onSubmit="return kakunin()">
+            <input type="hidden" name="empno" value="${emp.empno}"/>
+            <input type="submit" value="削除"/>
+          </form>
+        </td>
       </tr>
     </c:forEach>
     </table>
+    <p><a href="/useOracleUCP/NewEmp">新規作成</a></p>
     <p><a href="/useOracleUCP">戻る</a></p>
-    <jsp:include page="/footer.jsp" /> 
+    <jsp:include page="/footer.jsp" />
+    <script src="js/confirm.js"></script>
   </body>
 </html>
 
-<!-- 修正時刻: Tue Feb 16 06:53:49 2021 -->
+<!-- 修正時刻: Tue Feb 16 15:31:12 2021 -->
