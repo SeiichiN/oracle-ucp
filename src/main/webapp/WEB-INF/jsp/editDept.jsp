@@ -9,32 +9,35 @@
   <head>
     <meta charset="UTF-8"/>
     <title>所属部編集</title>
+    <jsp:include page="/style.jsp" /> 
   </head>
   <body>
-    <h1>所属部編集</h1>
-    <table>
-      <form action="/useOracleUCP/UpdateDept" method="post">
-        <tr>
-          <th>所属No</th>
-          <td><input type="number" min="1" name="deptno" value="${dept.deptno}"/></td>
-        </tr>
-        <tr>
-          <th>所属部名</th>
-          <td><input type="text" name="dname" value="${dept.dname}"/></td>
-        </tr>
-        <tr>
-          <th>電話番号</th>
-          <td><input type="text" name="telno" value="${dept.telno}"/></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td><input type="submit" value="OK"/></td>
-        </tr>
-      </form>
-    </table>
-    <p><a href="/useOracleUCP">戻る</a></p>
-    <jsp:include page="/footer.jsp" /> 
+    <div id="wrapper">
+      <h1>所属部編集</h1>
+      <table>
+        <form action="/useOracleUCP/UpdateDept" method="post">
+          <tr>
+            <th>所属No</th>
+            <td><input type="number" min="1" name="deptno" value="${dept.deptno}"/></td>
+          </tr>
+          <tr>
+            <th>所属部名</th>
+            <td><input type="text" name="dname" value="${dept.dname}"/></td>
+          </tr>
+          <tr>
+            <th>電話番号</th>
+            <td><input type="text" name="telno" value="${dept.telno}"/></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><input type="submit" value="OK"/></td>
+          </tr>
+        </form>
+      </table>
+      <p><a href="/useOracleUCP">戻る</a></p>
+      <jsp:include page="/footer.jsp" />
+    </div>
   </body>
 </html>
 
-<!-- 修正時刻: Tue Feb 16 07:54:29 2021 -->
+<!-- 修正時刻: Wed Feb 17 16:00:03 2021 -->

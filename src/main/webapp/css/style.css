@@ -1,7 +1,64 @@
 @charset "UTF-8";
 
-body {
-  background-color: #ffee00;
+/*  */
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* 修正時刻: Tue Feb 16 14:53:30 2021 */
+a {
+  color: #555;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #888;
+}
+
+body {
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f0f9ff+0,e2dcdc+100 */
+  background: #f0f9ff; /* Old browsers */
+  background: -moz-linear-gradient(top,  #f0f9ff 0%, #e2dcdc 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #f0f9ff 0%,#e2dcdc 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #f0f9ff 0%,#e2dcdc 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', endColorstr='#e2dcdc',GradientType=0 ); /* IE6-9 */
+
+}
+
+#wrapper {
+  height: 100vh;
+  padding: 0 10px;
+}
+
+.pencil,
+.trash {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pencil:hover,
+.trash:hover {
+  font-size: 1.2em;
+  margin: -2px -4px 2px -4px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table,
+th, td {
+  border: solid 1px #aaa;
+}
+
+th, td {
+  padding: 5px;
+}
+
+th {
+  text-align: left;
+}
+
+/* 修正時刻: Wed Feb 17 16:15:56 2021 */

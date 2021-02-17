@@ -152,6 +152,7 @@ public class EmpDao {
         List<EmpDept> empDeptList = new ArrayList<>();
         String sql = "SELECT empno, ename, job, age, dname FROM emp";
         sql = sql + " left outer join dept on emp.deptno = dept.deptno";
+        sql = sql + " ORDER BY  empno ASC";
 
         try (Connection conn = pds.getConnection()) {
             printPoolConnection( pds, "checkout" );
@@ -545,4 +546,4 @@ public class EmpDao {
     }
 }
 
-// 修正時刻: Tue Feb 16 20:36:04 2021
+// 修正時刻: Wed Feb 17 13:59:34 2021
